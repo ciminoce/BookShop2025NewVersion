@@ -1,0 +1,137 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<CategoryListVm>
+<div class="w-75 mx-auto">
+
+    <div class="row mb-3">
+        <div class="col-6">
+            <h1>Category List</h1>
+
+        </div>
+        <div class="col-6 text-end">
+            <a class="btn btn-primary" asp-controller="Categories" asp-action="Upsert">
+                <i class="bi bi-plus-circle"></i>
+                Create New Category
+            </a>
+        </div>
+    </div>
+    <form method="get" asp-action="Index" asp-controller="Categories" class="mb-3">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <label for="statusFilter">Select</label>
+            </div>
+            <div class="col-auto">
+                <select class="form-select" id="statusFilter" name="statusFilter">
+                    <option value="All" selected="@(ViewBag.CurrentStatusFilter=="All")">All</option>
+                    <option value="Active" selected="@(ViewBag.CurrentStatusFilter == "Active")">Active</option>
+                    <option value="Inactive" selected="@(ViewBag.CurrentStatusFilter == "Inactive")">Inactive</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    Apply Filter
+                </button>
+            </div>
+            <div class="col-auto">
+                <a class="btn btn-success" href="@Url.Action("Index","Categories")">
+                    Clear
+                </a>
+            </div>
+        </div>
+    </form>
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>
+                    <label asp-for="@Model.First().CategoryName"></label>
+                </th>
+                <th>
+                    <label asp-for="@Model.First().IsActive"></label>
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.CategoryName
+                    </td>
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">No</span>
+                        }
+                    </td>
+                    <td>
+                        <a class="btn btn-warning" asp-controller="Categories" asp-action="Upsert" asp-route-id="@item.CategoryId">
+                            <i class="bi bi-pencil-fill"></i>
+                            Edit
+                        </a>
+                        <button type="button" class="btn btn-danger" onclick="confirmarBaja(@item.CategoryId, '@item.CategoryName')">
+                            <i class="bi bi-trash"></i>
+                            Eliminar
+                        </button>
+
+                        <!-- Formulario oculto para submit POST -->
+                        <form id="formDelete-@item.CategoryId" method="post" asp-action="Delete" style="display: none;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.CategoryId" />
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @Html.PagedListPager(
+    Model,
+    page => Url.Action("Index", new { page, statusFilter=ViewBag.CurrentStatusFilter }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+            UlElementClasses = new[] { "pagination", "justify-content-center" },
+
+            LinkToFirstPageFormat = "<i class='bi bi-chevron-double-left'></i>",
+            LinkToPreviousPageFormat = "<i class='bi bi-chevron-left'></i>",
+            LinkToNextPageFormat = "<i class='bi bi-chevron-right'></i>",
+            LinkToLastPageFormat = "<i class='bi bi-chevron-double-right'></i>",
+
+            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+            DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+            DisplayLinkToNextPage = PagedListDisplayMode.Always,
+            DisplayLinkToLastPage = PagedListDisplayMode.Always,
+
+            DisplayLinkToIndividualPages = true,
+            MaximumPageNumbersToDisplay = 5
+        }
+        )
+</div>
+@section Scripts{
+
+    <script>
+        function confirmarBaja(id, name){
+            Swal.fire({
+              title: "Remove a Category",
+              html: `Are you sure to remove the category "<strong>${name}</strong>?"`,                 icon: "warning",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                   document.getElementById(`formDelete-${id}`).submit();
+
+              }
+            });
+        };
+    </script>
+}

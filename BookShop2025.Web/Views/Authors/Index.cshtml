@@ -1,0 +1,131 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<AuthorListVm>
+<div class="w-75 mx-auto">
+
+    <div class="row mb-3">
+        <div class="col-6">
+            <h1>Authors List</h1>
+
+        </div>
+        <div class="col-6 text-end">
+            <a class="btn btn-primary" asp-controller="Authors" asp-action="Upsert">
+                <i class="bi bi-plus-circle"></i>
+                Create New Author
+            </a>
+        </div>
+    </div>
+    <form method="get" asp-action="Index" asp-controller="Authors" class="mb-4 p-3 border rounded shadow-sm bg-light">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-5 col-lg-4">
+                <label for="searchText" class="form-label mb-0">Search Text</label>
+                <input type="text" class="form-control" id="searchText" name="searchText" value="@(ViewBag.CurrentSearchText ?? "")" placeholder="Enter author name or part of it" />
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <label for="orderAuthors" class="form-label mb-0">Order By</label>
+                <select class="form-select" id="orderAuthors" name="orderAuthors">
+                    <option value="Author" selected="@(ViewBag.CurrentOrderAuthors == "Author")">Author</option>
+                    <option value="Country" selected="@(ViewBag.CurrentOrderAuthors == "Country")">Country</option>
+                </select>
+            </div>
+            <div class="col-md-3 col-lg-5 d-flex align-items-end justify-content-md-start justify-content-lg-end">
+                <button type="submit" class="btn btn-primary me-2 flex-grow-1 flex-md-grow-0">
+                    <i class="bi bi-search"></i> Search / Apply Order
+                </button>
+                <a class="btn btn-secondary flex-grow-1 flex-md-grow-0" href="@Url.Action("Index", "Authors")">
+                    <i class="bi bi-arrow-clockwise"></i> Clear
+                </a>
+            </div>
+        </div>
+    </form>  
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>
+                    <label asp-for="@Model.First().FullName"></label>
+                </th>
+
+                <th>
+                    <label asp-for="@Model.First().CountryName"></label>
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.FullName
+                    </td>
+
+                    <td>
+                        @item.CountryName
+                    </td>
+                    <td>
+                        <a class="btn btn-warning" asp-controller="Authors" asp-action="Upsert" asp-route-id="@item.AuthorId">
+                            <i class="bi bi-pencil-fill"></i>
+                            Edit
+                        </a>
+                        <button type="button" class="btn btn-danger" onclick="confirmarBaja(@item.AuthorId, '@item.FullName')">
+                            <i class="bi bi-trash"></i>
+                            Eliminar
+                        </button>
+
+                        <!-- Formulario oculto para submit POST -->
+                        <form id="formDelete-@item.AuthorId" method="post" asp-action="Delete" style="display: none;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.AuthorId" />
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @Html.PagedListPager(
+    Model,
+    page => Url.Action("Index", new { page, searchText=ViewBag.CurrentSearchText, orderAuthors=ViewBag.CurrentOrderAuthors }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+            UlElementClasses = new[] { "pagination", "justify-content-center" },
+
+            LinkToFirstPageFormat = "<i class='bi bi-chevron-double-left'></i>",
+            LinkToPreviousPageFormat = "<i class='bi bi-chevron-left'></i>",
+            LinkToNextPageFormat = "<i class='bi bi-chevron-right'></i>",
+            LinkToLastPageFormat = "<i class='bi bi-chevron-double-right'></i>",
+
+            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+            DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+            DisplayLinkToNextPage = PagedListDisplayMode.Always,
+            DisplayLinkToLastPage = PagedListDisplayMode.Always,
+
+            DisplayLinkToIndividualPages = true,
+            MaximumPageNumbersToDisplay = 5
+        }
+        )
+</div>
+@section Scripts {
+
+    <script>
+        function confirmarBaja(id, name){
+            Swal.fire({
+              title: "Remove an Author",
+              html: `Are you sure to remove the author "<strong>${name}</strong>?"`,                 icon: "warning",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                   document.getElementById(`formDelete-${id}`).submit();
+
+              }
+            });
+        };
+    </script>
+}

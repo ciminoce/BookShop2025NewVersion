@@ -1,0 +1,66 @@
+﻿@model CategoryEditVm
+<form method="post">
+    @Html.AntiForgeryToken();
+    <input type="hidden" asp-for="CategoryId" />
+    <div class="border p-3 m-4 w-75 mx-auto">
+        <div class="row pb-2">
+            <h2 class="text-primary">@(Model.CategoryId==0?"Add Category":"Update Category")</h2>
+            <hr />
+        </div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="mb-3 row p-1">
+            <label class="p-0" asp-for="CategoryName"></label>
+            <input class="form-control" asp-for="CategoryName" />
+            <span class="text-danger" asp-validation-for="CategoryName"></span>
+        </div>
+        <div class="mb-3 row p-1">
+            <label class="p-0" asp-for="Description"></label>
+            <textarea class="form-control"
+                      asp-for="Description"
+                      style="width:100%;height: 150px; resize: none;"></textarea>
+            <span class="text-danger" asp-validation-for="Description"></span>
+
+        </div>
+        <div class="form-group form-check">
+            <input class="form-check-input" asp-for="IsActive" type="checkbox" />
+            <label class="form-check-label" asp-for="IsActive"></label>
+
+        </div>
+        @if (Model.CategoryId == 0)
+        {
+            <button class="btn btn-primary" type="submit">
+                <i class="bi bi-floppy2-fill"></i>
+                Save
+            </button>
+
+        }
+        else
+        {
+            <button class="btn btn-warning" type="submit">
+                <i class="bi bi-floppy2-fill"></i>
+                Update
+            </button>
+
+        }
+        <a class="btn btn-success" asp-controller="Categories" asp-action="Index">
+            <i class="bi bi-backspace"></i>
+            Back to List
+        </a>
+    </div>
+</form>
+@section Scripts {
+    @{
+        <!-- Place the first <script> tag in your HTML's <head> -->
+        <script src="https://cdn.tiny.cloud/1/ee4otp9ao47w6zc7rvtt4pdkf4mzwi5nzj603z034gzx78i0/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+
+        <!-- Place the following <script> and <textarea> tags your HTML's <body> -->
+        <script>
+            tinymce.init({
+              selector: 'textarea',
+              plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+              toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+            });
+        </script>
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

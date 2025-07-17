@@ -1,0 +1,32 @@
+﻿@model CountryEditVm
+<form method="post">
+    @Html.AntiForgeryToken();
+    <input type="hidden" asp-for="CountryId" />
+    <div class="border p-3 m-4 w-75 mx-auto">
+        <div class="row pb-2">
+            <h2 class="text-primary">Update Country</h2>
+            <hr />
+        </div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="mb-3 row p-1">
+            <label class="p-0" asp-for="CountryName"></label>
+            <input class="form-control" asp-for="CountryName" />
+            <span class="text-danger" asp-validation-for="CountryName"></span>
+        </div>
+
+        <button class="btn btn-warning" type="submit">
+            <i class="bi bi-floppy2-fill"></i>
+            Update
+        </button>
+        <a class="btn btn-success" asp-controller="Countries" asp-action="Index">
+            <i class="bi bi-backspace"></i>
+            Back to List
+        </a>
+    </div>
+</form>
+@section Scripts {
+    @{
+
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

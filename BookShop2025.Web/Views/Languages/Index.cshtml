@@ -1,0 +1,100 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model X.PagedList.IPagedList<LanguageListVm>
+<div class="w-75 mx-auto">
+
+    <div class="row mb-3">
+        <div class="col-6">
+            <h1>Language List</h1>
+
+        </div>
+        <div class="col-6 text-end">
+            <a class="btn btn-primary" asp-controller="Languages" asp-action="Upsert">
+                <i class="bi bi-plus-circle"></i>
+                Create New Language
+            </a>
+        </div>
+    </div>
+    <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <th>
+                    <label asp-for="@Model.First().LanguageName"></label>
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.LanguageName
+                    </td>
+                    <td>
+                        <a class="btn btn-warning" asp-controller="Languages" asp-action="Upsert" asp-route-id="@item.LanguageId">
+                            <i class="bi bi-pencil-fill"></i>
+                            Edit
+                        </a>
+                        <button type="button" class="btn btn-danger" onclick="confirmarBaja(@item.LanguageId, '@item.LanguageName')">
+                            <i class="bi bi-trash"></i>
+                            Eliminar
+                        </button>
+
+                        <!-- Formulario oculto para submit POST -->
+                        <form id="formDelete-@item.LanguageId" method="post" asp-action="Delete" style="display: none;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.LanguageId" />
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @Html.PagedListPager(
+    Model,
+    page => Url.Action("Index", new { page, statusFilter=ViewBag.CurrentStatusFilter }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+            UlElementClasses = new[] { "pagination", "justify-content-center" },
+
+            LinkToFirstPageFormat = "<i class='bi bi-chevron-double-left'></i>",
+            LinkToPreviousPageFormat = "<i class='bi bi-chevron-left'></i>",
+            LinkToNextPageFormat = "<i class='bi bi-chevron-right'></i>",
+            LinkToLastPageFormat = "<i class='bi bi-chevron-double-right'></i>",
+
+            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+            DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+            DisplayLinkToNextPage = PagedListDisplayMode.Always,
+            DisplayLinkToLastPage = PagedListDisplayMode.Always,
+
+            DisplayLinkToIndividualPages = true,
+            MaximumPageNumbersToDisplay = 5
+        }
+        )
+</div>
+@section Scripts{
+
+    <script>
+        function confirmarBaja(id, name){
+            Swal.fire({
+              title: "Remove a Language",
+              html: `Are you sure to remove the category "<strong>${name}</strong>?"`,                 icon: "warning",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                   document.getElementById(`formDelete-${id}`).submit();
+
+              }
+            });
+        };
+    </script>
+}

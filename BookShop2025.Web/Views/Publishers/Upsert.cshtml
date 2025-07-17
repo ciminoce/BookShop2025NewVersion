@@ -1,0 +1,51 @@
+﻿@model PublisherEditVm
+<form method="post">
+    @Html.AntiForgeryToken();
+    <input type="hidden" asp-for="PublisherId" />
+    <div class="border p-3 m-4 w-75 mx-auto">
+        <div class="row pb-2">
+            <h2 class="text-primary">@(Model.PublisherId==0?"Add A Publisher":"Update An Publisher")</h2>
+            <hr />
+        </div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="mb-3 row p-1">
+            <label class="p-0" asp-for="Name"></label>
+            <input class="form-control" asp-for="Name" />
+            <span class="text-danger" asp-validation-for="Name"></span>
+        </div>
+        <div class="mb-3 row p-1">
+            <label class="p-0" asp-for="CountryId"></label>
+            <select class="form-select" asp-for="CountryId" asp-items="@Model.Countries">
+                <option selected disabled>Select Country</option>
+            </select>
+            <span class="text-danger" asp-validation-for="CountryId"></span>
+        </div>
+
+        @if (Model.PublisherId == 0)
+        {
+            <button class="btn btn-primary" type="submit">
+                <i class="bi bi-floppy2-fill"></i>
+                Save
+            </button>
+
+        }
+        else
+        {
+            <button class="btn btn-warning" type="submit">
+                <i class="bi bi-floppy2-fill"></i>
+                Update
+            </button>
+
+        }
+        <a class="btn btn-success" asp-controller="Publishers" asp-action="Index">
+            <i class="bi bi-backspace"></i>
+            Back to List
+        </a>
+    </div>
+</form>
+@section Scripts {
+    @{
+
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
