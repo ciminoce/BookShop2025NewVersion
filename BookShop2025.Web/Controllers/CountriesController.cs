@@ -36,11 +36,11 @@ namespace BookShop2025.Web.Controllers
 
             return View(viewModelPagedList);
         }
-        public IActionResult Edit(int? id)
+        public IActionResult Upsert(int? id)
         {
             if(id is null || id == 0)
             {
-                return NotFound();
+                return View(new CountryEditVm());
             }
             try
             {
@@ -61,7 +61,7 @@ namespace BookShop2025.Web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(CountryEditVm countryVm)
+        public IActionResult Upsert(CountryEditVm countryVm)
         {
             if (ModelState.IsValid)
             {

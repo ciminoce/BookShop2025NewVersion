@@ -9,7 +9,7 @@
 
         </div>
         <div class="col-6 text-end">
-            <a class="btn btn-primary" asp-controller="Countries" asp-action="Create">
+            <a class="btn btn-primary" asp-controller="Countries" asp-action="Upsert">
                 <i class="bi bi-plus-circle"></i>
                 Create New Country
             </a>
@@ -34,14 +34,20 @@
                         @item.CountryName
                     </td>
                     <td>
-                        <a class="btn btn-warning" asp-controller="Countries" asp-action="Edit" asp-route-id="@item.CountryId">
+                        <a class="btn btn-warning" asp-controller="Countries" asp-action="Upsert" asp-route-id="@item.CountryId">
                             <i class="bi bi-pencil-fill"></i>
                             Edit
                         </a>
-                        <a class="btn btn-danger" asp-controller="Countries" asp-action="Delete" asp-route-id="@item.CountryId">
+                        <button type="button" class="btn btn-danger" onclick="confirmarBaja(@item.CountryId, '@item.CountryName')">
                             <i class="bi bi-trash"></i>
-                            Delete
-                        </a>
+                            Eliminar
+                        </button>
+
+                        <!-- Formulario oculto para submit POST -->
+                        <form id="formDelete-@item.CountryId" method="post" asp-action="Delete" style="display: none;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.CountryId" />
+                        </form>
                     </td>
                 </tr>
             }
@@ -71,3 +77,22 @@
         }
         )
 </div>
+<script>
+    function confirmarBaja(id, name){
+        Swal.fire({
+          title: "Remove an Author",
+          html: `Are you sure to remove the country "<strong>${name}</strong>?"`,                 icon: "warning",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+          if (result.isConfirmed) {
+               document.getElementById(`formDelete-${id}`).submit();
+
+          }
+        });
+    };
+</script>
+}
