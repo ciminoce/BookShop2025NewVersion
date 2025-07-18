@@ -37,7 +37,8 @@ namespace BookShop2025.Service.Services
                 default:
                     break;
             }
-            var categories= _unitOfWork.Categories.GetAll(filter:filterCategory);
+            Func<IQueryable<Category>, IOrderedQueryable<Category>>? orderCategory = c => c.OrderBy(ca => ca.CategoryName);
+            var categories= _unitOfWork.Categories.GetAll(filter:filterCategory,orderBy:orderCategory);
             return _mapper.ProjectTo<CategoryListDto>(categories);
         }
 

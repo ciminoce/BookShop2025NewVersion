@@ -38,7 +38,7 @@ namespace BookShop2025.Service.Mapping
         private void LoadAuthorMapping()
         {
             CreateMap<Author, AuthorListDto>()
-                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"))
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.LastName}, {src.FirstName}"))
                 .ForMember(dest => dest.CountryName, opt => opt.MapFrom(src => src.Country!.CountryName));
             CreateMap<Author, AuthorEditDto>();
             /*

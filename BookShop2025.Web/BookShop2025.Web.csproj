@@ -19,4 +19,8 @@
     <ProjectReference Include="..\BookShop2025.Ioc\BookShop2025.Ioc.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\Publishers\" />
+  </ItemGroup>
+
 </Project>

@@ -19,6 +19,7 @@ namespace BookShop2025.Data.Repositories
             {
                 publisherInDb.Name = publisher.Name;
                 publisherInDb.CountryId = publisher.CountryId;
+                publisherInDb.ImageUrl = publisher.ImageUrl;
                 //publisherInDb.Country = null;
 
             }

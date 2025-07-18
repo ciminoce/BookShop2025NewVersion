@@ -31,7 +31,8 @@ namespace BookShop2025.Service.Services
         }
         public IQueryable<CountryListDto> GetAll()
         {
-            var categories = _unitOfWork.Countries.GetAll();
+            Func<IQueryable<Country>, IOrderedQueryable<Country>>? orderCountry = c => c.OrderBy(ca => ca.CountryName);
+            var categories = _unitOfWork.Countries.GetAll(orderBy:orderCountry);
             return _mapper.ProjectTo<CountryListDto>(categories);
         }
 

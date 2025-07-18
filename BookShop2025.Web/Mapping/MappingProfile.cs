@@ -42,7 +42,7 @@ namespace BookShop2025.Web.Mapping
             CreateMap<AuthorListDto, AuthorListVm>();
             CreateMap<AuthorEditDto, AuthorEditVm>().ReverseMap();
             CreateMap<AuthorEditDto, AuthorListVm>()
-                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"));
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.LastName}, {src.FirstName}"));
 
         }
         private void LoadCountryMapping()

@@ -4,7 +4,7 @@ namespace BookShop2025.Data.Interfaces
 {
     public interface IAuthorService
     {
-        IQueryable<AuthorListDto> GetAll();
+        IQueryable<AuthorListDto> GetAll(string? searchText, string? orderBy="Author");
         bool Save(AuthorEditDto authorDto, out List<string> errors);
         AuthorEditDto? GetById(int id, bool tracked=false);
         bool Remove(int id, out List<string> errors);

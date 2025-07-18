@@ -18,9 +18,25 @@ namespace BookShop2025.Service.Services
             _mapper = mapper;
         }
 
-        public IQueryable<AuthorListDto> GetAll()
+        public IQueryable<AuthorListDto> GetAll(string? searchText, string? orderBy="Author")
         {
-            var authors = _unitOfWork.Authors.GetAll();
+            Func<IQueryable<Author>, IOrderedQueryable<Author>>? authorOrder = null;
+            if (orderBy=="Author")
+            {
+                authorOrder = a => a.OrderBy(a => a.LastName).ThenBy(a => a.FirstName);
+            }
+            else
+            {
+                authorOrder = a => a.OrderBy(a => a.Country!.CountryName)
+                    .ThenBy(a => a.LastName).ThenBy(a => a.FirstName);
+            }
+                Expression<Func<Author, bool>>? authorFilter = null;
+            if (searchText is not null)
+            {
+                authorFilter=a=>a.FirstName.Contains(searchText) ||
+                    a.LastName.Contains(searchText);
+            }
+            var authors = _unitOfWork.Authors.GetAll(filter:authorFilter,orderBy:authorOrder);
             return _mapper.ProjectTo<AuthorListDto>(authors);
         }
 
