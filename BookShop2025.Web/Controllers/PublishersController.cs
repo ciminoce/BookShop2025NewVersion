@@ -228,38 +228,75 @@ namespace BookShop2025.Web.Controllers
             {
                 return NotFound();
             }
+
+            string wwwRoot = _webHostEnvironment.WebRootPath; // Asumiendo que tienes esto inyectado
+
             try
             {
+                // 1. Obtener los detalles del Publisher, incluyendo la ImageUrl, ANTES de eliminarlo.
                 PublisherEditDto? publisherDto = _publisherService.GetById(id.Value);
+
                 if (publisherDto is null)
                 {
                     return NotFound($"Publisher With Id {id} Not Found!!");
                 }
+
+                // 2. Intentar eliminar el Publisher de la base de datos.
                 if (_publisherService.Remove(id.Value, out var errors))
                 {
-                    TempData["success"] = "Publisher Succesfully Removed";
+                    // 3. Si la eliminación de la DB fue exitosa, entonces procede a eliminar la imagen.
+                    if (!string.IsNullOrEmpty(publisherDto.ImageUrl))
+                    {
+                        // Construye la ruta física completa de la imagen.
+                        // Es importante usar TrimStart('\\') para evitar doble barra si ImageUrl ya la tiene.
+                        string imagePath = Path.Combine(wwwRoot, publisherDto.ImageUrl.TrimStart('\\'));
+
+                        // Verifica si el archivo existe antes de intentar borrarlo.
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            try
+                            {
+                                System.IO.File.Delete(imagePath);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Si falla la eliminación de la imagen, registra el error pero no detengas
+                                // la operación principal (el Publisher ya se eliminó de la DB).
+                                // No es un error crítico para el usuario, pero es bueno saberlo.
+                                TempData["warning"] = "Publisher removed, but failed to delete associated image file.";
+                            }
+                        }
+                    }
+
+                    TempData["success"] = "Publisher Successfully Removed";
                     return RedirectToAction("Index");
                 }
                 else
                 {
+                    // Si la eliminación de la DB falló (ej. por restricciones de clave foránea),
+                    // no se borra la imagen.
                     PublisherListVm publisherVm = _mapper.Map<PublisherListVm>(publisherDto);
                     var paisDto = _countryService.GetById(publisherDto.CountryId);
-                    publisherVm.CountryName = paisDto!.CountryName;
+                    publisherVm.CountryName = paisDto?.CountryName ?? "Unknown Country"; // Manejo de null si paisDto es null
 
-                    ModelState.AddModelError(string.Empty, errors.First());
+                    // Aplica la verificación de Any() para evitar "Sequence contains no elements"
+                    if (errors != null && errors.Any())
+                    {
+                        ModelState.AddModelError(string.Empty, errors.First());
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Failed to remove publisher due to an unknown error.");
+                    }
                     return View(publisherVm);
-
                 }
             }
-            catch (Exception)
+            catch (Exception ex) // Captura cualquier excepción imprevista durante el proceso
             {
-
-                TempData["error"] = "Error while trying to get a publisher";
+                TempData["error"] = "An unexpected error occurred while trying to remove the publisher.";
                 return RedirectToAction("Index");
             }
-
         }
-
         private List<SelectListItem> GetCountries()
         {
             return _countryService.GetAll()

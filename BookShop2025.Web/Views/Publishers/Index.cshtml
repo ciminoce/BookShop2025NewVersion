@@ -19,6 +19,10 @@
         <thead>
             <tr>
                 <th>
+                    <label asp-for="@Model.First().ImageUrl"></label>
+
+                </th>
+                <th>
                     <label asp-for="@Model.First().Name"></label>
                 </th>
 
@@ -34,6 +38,19 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td class="col-1">
+                        @if (item.ImageUrl is null)
+                        {
+                            <img  class="img-thumbnail "src="/Images/SinImagenDisponible.jpg" />
+
+                        }
+                        else
+                        {
+                            <img class="img-thumbnail" src="@item.ImageUrl"  />
+
+                        }
+
+                    </td>
                     <td>
                         @item.Name
                     </td>
